@@ -18,6 +18,7 @@
 
 int main(void)
 {
+
     // SETUP PHASE
     lcd_init(LCD_DISP_ON);
     lcd_clrscr();

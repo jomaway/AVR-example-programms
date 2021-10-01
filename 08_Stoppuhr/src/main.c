@@ -32,7 +32,7 @@ volatile uint8_t changed = FALSE;
 
 void timer_init(){
     // konfigure Timer1 for counting seconds
-    TCCR1B |= ((1 << CS12) | (1 << CS00));
+    TCCR1B |= ((1 << CS12) | (1 << CS10));
     // Set start value for TIMER1
     TCNT1 = TIMER1_START_VALUE;
     // Activate Timer1 
@@ -56,6 +56,7 @@ int main(void)
     // SETUP PHASE    
     timer_init();
     taster_init();
+    
     lcd_init(LCD_DISP_ON);
     lcd_clrscr();
     sei();
@@ -76,19 +77,19 @@ int main(void)
 
         if(!(PIND & (1 << TASTER_RESET_PIN))) {
             ATOMIC_BLOCK(ATOMIC_FORCEON){
-                RESET(counter);
+                counter = 0; // RESET(counter); // counter = 0;
             }
-            lcd_gotoxy(0,1);
-            lcd_puts("        ");
+            lcd_gotoxy(0,1);            // lcd_clrscr();
+            lcd_puts("        ");       // lcd_puts("RUNNING ...");
             changed = TRUE;
         }
 
         if (changed) {
-            ATOMIC_BLOCK(ATOMIC_FORCEON)
-            {
-                itoa(counter, textvalue, 10);  // convert counter to a asciistring and save to textvalue
-            }
-            update_display(textvalue);
+            cli();
+            itoa(counter, textvalue, 10);  // convert counter to a asciistring and save to textvalue
+            sei();
+            lcd_gotoxy(0, 1);
+            lcd_puts(textvalue);
             changed = FALSE; 
         }
         //_delay_ms(100);
